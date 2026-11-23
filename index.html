@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>30 spots insolites — Amérique du Sud</title>
+<style>
+  :root{--bg:#f6f3ee;--card:#fff;--fg:#1b1b1b;--mute:#6b6b6b;--acc:#c2410c;--line:#e7e1d8}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 -apple-system,system-ui,sans-serif}
+  header{padding:20px 16px 8px;max-width:560px;margin:auto}
+  h1{font-size:21px;margin:0 0 4px}
+  .sub{color:var(--mute);font-size:13px}
+  .filtres{display:flex;gap:6px;overflow-x:auto;padding:12px 16px;max-width:560px;margin:auto}
+  .filtres button{flex:none;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:6px 12px;font-size:13px;color:var(--fg)}
+  .filtres button[aria-pressed=true]{background:var(--fg);color:#fff;border-color:var(--fg)}
+  main{max-width:560px;margin:auto;padding:0 16px 40px}
+  article{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+  .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .jour{font-size:12px;font-weight:700;color:var(--acc);letter-spacing:.04em}
+  .pays{font-size:12px;color:var(--mute)}
+  h2{font-size:17px;margin:4px 0 8px}
+  .hook{font-weight:600;margin:0 0 6px}
+  .ecran{display:inline-block;background:#1b1b1b;color:#fff;font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin-bottom:8px}
+  .fait{margin:0;color:#333}
+  .quand{font-size:12px;color:var(--mute);margin-top:6px}
+  button.copier{margin-top:10px;border:1px solid var(--line);background:none;border-radius:8px;padding:6px 10px;font-size:13px;color:var(--fg)}
+  .photo{width:calc(100% + 28px);margin:-14px -14px 10px;aspect-ratio:4/3;object-fit:cover;border-radius:14px 14px 0 0;display:block;background:#e7e1d8}
+  .sansphoto{width:calc(100% + 28px);margin:-14px -14px 10px;aspect-ratio:4/3;border-radius:14px 14px 0 0;background:#e7e1d8;display:flex;align-items:center;justify-content:center;color:#6b6b6b;font-size:13px}
+  .notephoto{font-size:11px;color:#6b6b6b;margin:-4px 0 8px}
+  a.dl{display:inline-block;text-decoration:none;margin-left:6px}
+  .photo{cursor:zoom-in}
+  #zoom{position:fixed;inset:0;z-index:100;background:#000;display:none}
+  #zoom.ouvert{display:block}
+  #zoom .scroll{position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;display:flex}
+  #zoom img{flex:none;width:100%;height:auto;margin:auto;display:block;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+  #zoom.agrandi img{width:250%;max-width:none}
+  #zoom .fermer{position:fixed;z-index:101;top:max(12px,env(safe-area-inset-top));right:12px;width:44px;height:44px;border-radius:22px;border:0;background:rgba(255,255,255,.25);color:#fff;font-size:22px}
+  #zoom .aide{position:fixed;z-index:101;bottom:max(14px,env(safe-area-inset-bottom));left:0;right:0;margin:0;text-align:center;color:#ccc;font-size:12px;pointer-events:none}
+  body.bloque{overflow:hidden}
+  .note{font-size:12px;color:var(--mute);margin-top:16px}
+</style>
+</head>
+<body>
+<header>
+  <h1>30 spots insolites</h1>
+  <div class="sub">Un lieu par jour · accroche parlée + texte écran + fait clé</div>
+</header>
+<nav class="filtres" id="filtres"></nav>
+<main id="liste"></main>
+<main><p class="note">Photos : Pexels (licence libre). Faits à revérifier avant tournage (horaires, accès, saisons). Accroches en français, à humaniser à ta voix.</p></main>
+
+<div id="zoom" role="dialog" aria-modal="true" aria-label="Photo en grand"><div class="scroll"><img alt=""></div><button class="fermer" aria-label="Fermer">✕</button><p class="aide">Touche pour zoomer · pince pour zoomer plus</p></div>
+<script>
+const spots = [
+ ["Cerros de Mavecure","Colombie","Trois rochers géants plantés au milieu de la jungle.","3 GÉANTS DE PIERRE","Monolithes de granit au bord du fleuve Inírida (Guainía). Accès en avion jusqu'à Inírida puis en bateau.","Décembre à mars (saison sèche)"],
+ ["Cimetière de trains d'Uyuni","Bolivie","Des dizaines de locomotives abandonnées en plein désert.","TRAINS FANTÔMES","Locomotives du début du XXe siècle laissées à la rouille près du salar.","Toute l'année"],
+ ["Laguna Colorada","Bolivie","Ce lac est rouge. Et il est plein de flamants roses.","LE LAC ROUGE","Algues rouges, flamants, et environ 4 300 m d'altitude.","Mai à novembre (saison sèche)"],
+ ["Mano del Desierto","Chili","Une main de 11 mètres sort du sable. En plein Atacama.","MAIN GÉANTE","Sculpture de Mario Irarrázabal, au bord de la Panaméricaine.","Toute l'année"],
+ ["Chapelles de marbre","Chili","L'eau a sculpté des grottes de marbre bleu en Patagonie.","GROTTES DE MARBRE","Lac General Carrera, visite en bateau ou en kayak.","Octobre à avril"],
+ ["Vinicunca","Pérou","Une montagne arc-en-ciel à plus de 5 000 mètres.","MONTAGNE ARC-EN-CIEL","Couches de minéraux colorés. Monte lentement : l'altitude se paie.","Avril à novembre"],
+ ["Huacachina","Pérou","Un village entier autour d'une oasis, au milieu des dunes.","OASIS AU PÉROU","Buggy et sandboard sur les dunes autour du lagon.","Toute l'année"],
+ ["Lignes de Nazca","Pérou","Ces dessins font des centaines de mètres. On ne les voit que du ciel.","VISIBLES D'EN HAUT","Géoglyphes vieux de plus de 1 500 ans, survol en petit avion.","Toute l'année"],
+ ["Lençóis Maranhenses","Brésil","Des lagons turquoise au milieu des dunes. Sans rivière.","DUNES + LAGONS","L'eau de pluie remplit les creux entre les dunes.","Juin à septembre"],
+ ["Salto Ángel","Venezuela","La plus haute chute d'eau du monde : 979 mètres.","979 MÈTRES","Tombe du tepui Auyán, accès en pirogue et à pied.","Juin à novembre"],
+ ["Cerro Autana","Venezuela","Cette montagne est traversée par une grotte. De part en part.","MONTAGNE PERCÉE","Tepui sacré pour le peuple Piaroa, en Amazonie vénézuélienne. On l'observe en survol ou depuis le fleuve.","Décembre à avril"],
+ ["Sanctuaire de Las Lajas","Colombie","Une église construite en travers d'un canyon.","ÉGLISE SUR UN CANYON","Bâtie au-dessus de la rivière Guáitara, près de la frontière équatorienne.","Toute l'année"],
+ ["El Peñol de Guatapé","Colombie","Plus de 700 marches pour la meilleure vue de Colombie.","700 MARCHES","Rocher géant au-dessus d'un lac aux mille îlots.","Toute l'année"],
+ ["Désert de la Tatacoa","Colombie","Ce désert n'en est pas un.","FAUX DÉSERT","Forêt sèche tropicale aux canyons rouges et gris. Ciel top pour les étoiles.","Toute l'année"],
+ ["Laguna Quilotoa","Équateur","Un lac turquoise au fond d'un volcan.","LAC DANS UN VOLCAN","Descente facile, remontée dure (ou à dos de mule).","Juin à septembre"],
+ ["Casa del Árbol","Équateur","Une balançoire au-dessus du vide, face à un volcan actif.","BALANÇOIRE DU BOUT DU MONDE","À Baños, face au Tungurahua.","Toute l'année"],
+ ["Îles des Uros","Pérou","Des gens vivent sur des îles qu'ils fabriquent eux-mêmes.","ÎLES FLOTTANTES","Îles en roseaux de totora sur le lac Titicaca.","Toute l'année"],
+ ["Moray","Pérou","Les Incas avaient un laboratoire agricole. Le voici.","LABO INCA","Terrasses circulaires où la température change d'un étage à l'autre.","Avril à octobre"],
+ ["Salines de Maras","Pérou","Des milliers de bassins de sel, exploités depuis les Incas.","MILLIERS DE BASSINS","Une source salée alimente les bassins à flanc de montagne.","Mai à novembre"],
+ ["Cueva de las Manos","Argentine","Des mains peintes il y a environ 9 000 ans.","9 000 ANS","Pochoirs de mains dans un canyon de Patagonie, classé UNESCO.","Octobre à avril"],
+ ["Glacier Perito Moreno","Argentine","Tu peux entendre ce glacier craquer.","IL CRAQUE","Des blocs de glace tombent dans le lac devant les passerelles.","Octobre à avril"],
+ ["Ischigualasto","Argentine","Ici, on trouve des dinosaures parmi les plus vieux du monde.","DINOSAURES","Parc du Trias, roches sculptées par le vent.","Toute l'année"],
+ ["Cerro de los Siete Colores","Argentine","Une colline à sept couleurs, au-dessus d'un village.","7 COULEURS","Purmamarca, dans la Quebrada de Humahuaca.","Toute l'année"],
+ ["Rapa Nui","Chili","Près de 900 statues sur une île perdue dans le Pacifique.","900 MOAÏS","Île de Pâques, à plus de 3 500 km du continent.","Toute l'année"],
+ ["Valle de la Luna (La Paz)","Bolivie","Un paysage lunaire à quelques kilomètres de La Paz.","LA LUNE EN VILLE","Pics d'argile sculptés par l'érosion, avec des sentiers balisés.","Toute l'année"],
+ ["Bonito","Brésil","Une rivière si claire qu'on dirait que les poissons volent.","EAU TRANSPARENTE","Snorkeling en descente de rivière, accès encadré.","Toute l'année"],
+ ["Valle de la Luna (Atacama)","Chili","Le désert le plus sec du monde ressemble à la Lune.","DÉSERT LUNAIRE","Près de San Pedro de Atacama. Viens pour le coucher de soleil.","Toute l'année"],
+ ["Casapueblo","Uruguay","Un artiste a construit ce bâtiment à la main.","CONSTRUIT À LA MAIN","Œuvre de Carlos Páez Vilaró, à Punta Ballena. Coucher de soleil célèbre.","Toute l'année"],
+ ["Laguna 69","Pérou","Un lac turquoise à environ 4 600 mètres.","4 600 MÈTRES","Randonnée d'une journée depuis Huaraz, Cordillère Blanche.","Mai à septembre"],
+ ["Salar d'Uyuni inondé","Bolivie","Le plus grand miroir du monde.","MIROIR GÉANT","Après la pluie, le salar reflète le ciel.","Janvier à mars"]
+];
+
+const P = {1:13792538,2:5987086,3:30998364,4:30998318,5:30427242,6:35256938,7:7435822,8:28831037,9:19151869,10:7360544,11:12693427,12:28210665,13:14773970,14:18364129,15:13085273,16:30752923,17:19032103,18:28432051,19:11457916,20:37054084,21:26988244,22:8043782,23:13430664,24:5819212,25:17783748,26:14584514,27:18608914,28:30615929,29:17046884,30:30929499};
+const url = (i, w) => `https://images.pexels.com/photos/${i}/pexels-photo-${i}.jpeg?auto=compress&cs=tinysrgb&w=${w}`;
+const photos = {}, hd = {};
+for (const n in P) { photos[n] = url(P[n], 600); hd[n] = url(P[n], 1080); }
+const notesPhoto = {10: "Photo : parc de Canaima (chute + tepui), pas le Salto Ángel lui-même."};
+
+const liste = document.getElementById('liste');
+const filtres = document.getElementById('filtres');
+const paysList = ['Tous', ...new Set(spots.map(s => s[1]))];
+let actif = 'Tous';
+
+function rendre(){
+  liste.innerHTML = '';
+  spots.forEach((s,i) => {
+    if(actif !== 'Tous' && s[1] !== actif) return;
+    const a = document.createElement('article');
+    const ph = photos[i+1] ? `<img class="photo" loading="lazy" alt="${s[0]}" src="${photos[i+1]}">` : `<div class="sansphoto">Photo libre introuvable : à prendre ou à trouver</div>`;
+    const np = notesPhoto[i+1] ? `<p class="notephoto">${notesPhoto[i+1]}</p>` : '';
+    a.innerHTML = ph + np + `<div class="top"><span class="jour">JOUR ${i+1}</span><span class="pays">${s[1]}</span></div>
+      <h2>${s[0]}</h2><p class="hook">« ${s[2]} »</p><span class="ecran">${s[3]}</span>
+      <p class="fait">${s[4]}</p><div class="quand">Meilleure période : ${s[5]}</div>
+      <button class="copier">Copier</button>${hd[i+1] ? ` <a class="copier dl" target="_blank" rel="noopener" href="${hd[i+1]}">Photo HD</a>` : ''}`;
+    a.querySelector('.copier').onclick = (e) => {
+      const txt = `${s[0]} (${s[1]})\nAccroche : ${s[2]}\nÉcran : ${s[3]}\n${s[4]}\nPériode : ${s[5]}`;
+      try { navigator.clipboard.writeText(txt); e.target.textContent = 'Copié'; } catch(_) {}
+    };
+    const im = a.querySelector('.photo');
+    if (im) im.onclick = () => ouvrirZoom(photos[i+1], hd[i+1], s[0]);
+    liste.appendChild(a);
+  });
+}
+paysList.forEach(p => {
+  const b = document.createElement('button');
+  b.textContent = p; b.setAttribute('aria-pressed', p === actif);
+  b.onclick = () => { actif = p; filtres.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.textContent === p)); rendre(); };
+  filtres.appendChild(b);
+});
+rendre();
+const zoom = document.getElementById('zoom');
+const zimg = zoom.querySelector('img');
+const sc = zoom.querySelector('.scroll');
+let fx = .5, fy = .5;
+function centrer(){
+  sc.scrollLeft = Math.max(0, fx * zimg.offsetWidth - sc.clientWidth / 2);
+  sc.scrollTop = Math.max(0, fy * zimg.offsetHeight - sc.clientHeight / 2);
+}
+function ouvrirZoom(petite, grande, nom){
+  zoom.classList.remove('agrandi');
+  zimg.alt = nom; zimg.src = petite;
+  if (grande) { const h = new Image(); h.onload = () => { if (zimg.alt === nom) { zimg.src = grande; if (zoom.classList.contains('agrandi')) centrer(); } }; h.src = grande; }
+  zoom.classList.add('ouvert'); document.body.classList.add('bloque');
+  sc.scrollTop = 0; sc.scrollLeft = 0;
+}
+function fermerZoom(){ zoom.classList.remove('ouvert','agrandi'); document.body.classList.remove('bloque'); zimg.removeAttribute('src'); zimg.alt = ''; }
+zimg.addEventListener('click', (e) => {
+  const r = zimg.getBoundingClientRect();
+  fx = (e.clientX - r.left) / r.width; fy = (e.clientY - r.top) / r.height;
+  zoom.classList.toggle('agrandi');
+  if (zoom.classList.contains('agrandi')) requestAnimationFrame(centrer); else { sc.scrollTop = 0; sc.scrollLeft = 0; }
+});
+zoom.querySelector('.fermer').addEventListener('click', fermerZoom);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerZoom(); });
+</script>
+</body>
+</html>
